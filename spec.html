@@ -27855,17 +27855,20 @@
         </h1>
         <dl class="header">
           <dt>description</dt>
-          <dd>It performs any necessary setup work in order to make available the module corresponding to _specifier_ occurring within the context of the script or module represented by _referencingScriptOrModule_. _referencingScriptOrModule_ may be *null* if there is no active script or module when the <emu-xref href="#sec-import-calls">`import()`</emu-xref> expression occurs. It then performs FinishDynamicImport to finish the dynamic import process.</dd>
+          <dd>It performs any necessary work in order to load and evaluate the module corresponding to _specifier_ occurring within the context of the script or module represented by _referencingScriptOrModule_. _referencingScriptOrModule_ may be *null* if there is no active script or module when the <emu-xref href="#sec-import-calls">`import()`</emu-xref> expression occurs.</dd>
         </dl>
 
         <emu-alg>
           1. Let _success_ be a new Abstract Closure that captures _referencingScriptOrModule_, _specifier_, and _promiseCapability_ and performs the following steps when called:
-            1. Let _promise_ be ! PromiseResolve(%Promise%, *undefined*).
-            1. Perform FinishDynamicImport(_referencingScriptOrModule_, _specifier_, _promiseCapability_, _promise_).
+            1. Let _moduleRecord_ be ! ResolveImportedModule(_referencingScriptOrModule_, _specifier_).
+            1. Assert: Evaluate has already been invoked on _moduleRecord_ and successfully completed.
+            1. Let _namespace_ be Completion(GetModuleNamespace(_moduleRecord_)).
+            1. If _namespace_ is an abrupt completion, then
+              1. Perform ! Call(_promiseCapability_.[[Reject]], *undefined*, &laquo; _namespace_.[[Value]] &raquo;).
+            1. Else,
+              1. Perform ! Call(_promiseCapability_.[[Resolve]], *undefined*, &laquo; _namespace_.[[Value]] &raquo;).
           1. Let _failure_ be a new Abstract Closure with parameters (_error_) that captures _referencingScriptOrModule_, _specifier_, and _promiseCapability_ and performs the following steps when called:
-            1. Let _pc_ be ! NewPromiseCapability(%Promise%).
-            1. Perform ! Call(_pc_.[[Reject]], *undefined*, &laquo; _error_ &raquo;).
-            1. Perform FinishDynamicImport(_referencingScriptOrModule_, _specifier_, _promiseCapability_, _pc_.[[Promise]]).
+            1. Perform ! Call(_promiseCapability_.[[Reject]], *undefined*, &laquo; _error_ &raquo;).
           1. Let _currentRealm_ be the current Realm.
           1. If there exists a Record _record_ in _currentRealm_.[[ModuleMap]] such that _record_.[[ReferencingScriptOrModule]] is _referencingScriptOrModule_ and _record_.[[Specifier]] is _specifier_, then
             1. Perform _success_().
@@ -27920,40 +27923,6 @@ s already been evaluated, i.e. whose Evaluate concrete method has already been c
         </ul>
 
         <p>The actual process performed is host-defined, but typically consists of performing whatever I/O operations are necessary to allow HostResolveImportedModule to synchronously retrieve the appropriate Module Record, and then calling its Evaluate concrete method. This might require performing similar normalization as HostResolveImportedModule does.</p>
-      </emu-clause>
-
-      <emu-clause id="sec-finishdynamicimport" type="abstract operation">
-        <h1>
-          FinishDynamicImport (
-            _referencingScriptOrModule_: unknown,
-            _specifier_: unknown,
-            _promiseCapability_: a PromiseCapability Record,
-            _innerPromise_: unknown,
-          ): ~unused~
-        </h1>
-        <dl class="header">
-          <dt>description</dt>
-          <dd>FinishDynamicImport completes the process of a dynamic import originally started by an <emu-xref href="#sec-import-calls">`import()`</emu-xref> call, resolving or rejecting the promise returned by that call as appropriate according to _innerPromise_'s resolution. It is performed by host environments as part of HostImportModuleDynamically.</dd>
-        </dl>
-        <emu-alg>
-          1. Let _fulfilledClosure_ be a new Abstract Closure with parameters (_result_) that captures _referencingScriptOrModule_, _specifier_, and _promiseCapability_ and performs the following steps when called:
-            1. Assert: _result_ is *undefined*.
-            1. Let _moduleRecord_ be ! ResolveImportedModule(_referencingScriptOrModule_, _specifier_).
-            1. Assert: Evaluate has already been invoked on _moduleRecord_ and successfully completed.
-            1. Let _namespace_ be Completion(GetModuleNamespace(_moduleRecord_)).
-            1. If _namespace_ is an abrupt completion, then
-              1. Perform ! Call(_promiseCapability_.[[Reject]], *undefined*, &laquo; _namespace_.[[Value]] &raquo;).
-            1. Else,
-              1. Perform ! Call(_promiseCapability_.[[Resolve]], *undefined*, &laquo; _namespace_.[[Value]] &raquo;).
-            1. Return ~unused~.
-          1. Let _onFulfilled_ be CreateBuiltinFunction(_fulfilledClosure_, 0, *""*, &laquo; &raquo;).
-          1. Let _rejectedClosure_ be a new Abstract Closure with parameters (_error_) that captures _promiseCapability_ and performs the following steps when called:
-            1. Perform ! Call(_promiseCapability_.[[Reject]], *undefined*, &laquo; _error_ &raquo;).
-            1. Return ~unused~.
-          1. Let _onRejected_ be CreateBuiltinFunction(_rejectedClosure_, 0, *""*, &laquo; &raquo;).
-          1. Perform PerformPromiseThen(_innerPromise_, _onFulfilled_, _onRejected_).
-          1. Return ~unused~.
-        </emu-alg>
       </emu-clause>
 
       <emu-clause id="sec-getmodulenamespace" type="abstract operation">
