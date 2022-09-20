@@ -19484,7 +19484,7 @@
           1. Let _specifierString_ be Completion(ToString(_specifier_)).
           1. IfAbruptRejectPromise(_specifierString_, _promiseCapability_).
           1. Let _state_ be a new ModuleLoadState Record { [[Action]]: ~dynamic-import~, [[PromiseCapability]]: _promiseCapability_ }.
-          1. Perform HostLoadImportedModule(_referrer_, _specifier_, *undefined*, _state_).
+          1. Perform HostLoadImportedModule(_referrer_, _specifierString_, *undefined*, _state_).
           1. Return _promiseCapability_.[[Promise]].
         </emu-alg>
 
@@ -26622,7 +26622,7 @@
                   1. If _module_.[[LoadedModules]] contains a Record _record_ such that _record_.[[Specifier]] is _required_, then
                     1. Perform ContinueModuleLoading(_state_, NormalCompletion(_record_.[[Module]])).
                   1. Else,
-                    1. Perform HostLoadImportedModule(_referrer_, _specifier_, _state_.[[HostDefined]], _state_).
+                    1. Perform HostLoadImportedModule(_module_, _required_, _state_.[[HostDefined]], _state_).
                     1. NOTE: HostLoadImportedModule will call ContinueModuleLoading.
               1. Assert: _state_.[[PendingModules]] &ge; 1.
               1. Set _state_.[[PendingModules]] to _state_.[[PendingModules]] - 1.
@@ -28177,7 +28177,7 @@
           FinishLoadImportedModule (
             _referrer_: a Script Record, a Cyclic Module Record, or a Realm Record,
             _specifier_: a String,
-            _payload_: a ModuleLoadState Record,
+            _state_: a ModuleLoadState Record,
             _result_: either a normal completion containing a Module Record or a throw completion,
           ): ~unused~
         </h1>
