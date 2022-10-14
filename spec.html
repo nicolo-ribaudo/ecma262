@@ -19483,7 +19483,7 @@
           1. Let _promiseCapability_ be ! NewPromiseCapability(%Promise%).
           1. Let _specifierString_ be Completion(ToString(_specifier_)).
           1. IfAbruptRejectPromise(_specifierString_, _promiseCapability_).
-          1. Let _state_ be the ModuleLoadState Record { [[Action]]: ~dynamic-import~, [[PromiseCapability]]: _promiseCapability_, [[IsLoading]]: ~empty~, [[PendingModules]]: ~empty~, [[Visited]]: ~empty~, [[HostDefined]]: *undefined* }.
+          1. Let _state_ be the ModuleLoadState Record { [[Action]]: ~dynamic-import~, [[PromiseCapability]]: _promiseCapability_, [[IsLoading]]: *true*, [[PendingModules]]: 1, [[Visited]]: &laquo; &raquo;, [[HostDefined]]: *undefined* }.
           1. Perform HostLoadImportedModule(_referrer_, _specifierString_, *undefined*, _state_).
           1. Return _promiseCapability_.[[Promise]].
         </emu-alg>
@@ -19505,7 +19505,9 @@
               1. Perform ! Call(_promiseCapability_.[[Reject]], *undefined*, &laquo; _moduleCompletion_.[[Value]] &raquo;).
               1. Return ~unused~.
             1. Let _module_ be _moduleCompletion_.[[Value]].
-            1. Let _loadPromise_ be _module_.LoadRequestedModules().
+            1. Set _state_.[[Action]] to ~graph-loading~.
+            1. Set _state_.[[PromiseCapability]] to ! NewPromiseCapability(%Promise%).
+            1. Let _loadPromise_ be _module_.LoadRequestedModules(*undefined*, _state_).
             1. Let _rejectedClosure_ be a new Abstract Closure with parameters (_reason_) that captures _promiseCapability_ and performs the following steps when called:
               1. Perform ! Call(_promiseCapability_.[[Reject]], *undefined*, &laquo; _reason_ &raquo;).
               1. Return ~unused~.
@@ -26284,7 +26286,7 @@
             </tr>
             <tr>
               <td>
-                LoadRequestedModules( [ _hostDefined_ ] )
+                LoadRequestedModules( [ _hostDefined_ [, _state_ ] ] )
               </td>
               <td>
                 <p>Prepares the module for linking by recursively loading all its dependencies, and returns a promise.</p>
@@ -26580,6 +26582,7 @@
           <h1>
             LoadRequestedModules (
               optional _hostDefined_: anything,
+              optional _state_: a ModuleLoadState Record whose [[Action]] is ~graph-loading~,
             ): a Promise object
           </h1>
           <dl class="header">
@@ -26593,7 +26596,7 @@
           <emu-alg>
             1. If _hostDefined_ is not present, let _hostDefined_ be *undefined*.
             1. Let _pc_ be ! NewPromiseCapability(%Promise%).
-            1. Let _state_ be the ModuleLoadState Record { [[Action]]: ~graph-loading~, [[IsLoading]]: *true*, [[PendingModules]]: 1, [[Visited]]: a new empty List, [[PromiseCapability]]: _pc_, [[HostDefined]]: _hostDefined_ }.
+            1. If _state_ is not provided, let _state_ be the ModuleLoadState Record { [[Action]]: ~graph-loading~, [[IsLoading]]: *true*, [[PendingModules]]: 1, [[Visited]]: a new empty List, [[PromiseCapability]]: _pc_, [[HostDefined]]: _hostDefined_ }.
             1. Perform InnerModuleLoading(_state_, _module_).
             1. Return _pc_.[[Promise]].
           </emu-alg>
