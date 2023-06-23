@@ -9673,15 +9673,6 @@
         1. Return AssignmentTargetType of _expr_.
       </emu-alg>
       <emu-grammar>
-        ParenthesizedExpression :
-          `(` Expression `)`
-      </emu-grammar>
-      <emu-alg>
-        1. Let _type_ be AssignmentTargetType of |Expression|.
-        1. If _type_ is ~simple~, return ~simple~.
-        1. Return ~invalid~.
-      </emu-alg>
-      <emu-grammar>
         PrimaryExpression :
           `this`
           Literal
