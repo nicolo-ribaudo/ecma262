@@ -20356,12 +20356,13 @@
       <emu-alg>
         1. If |LeftHandSideExpression| is neither an |ObjectLiteral| nor an |ArrayLiteral|, then
           1. Let _lref_ be ? Evaluation of |LeftHandSideExpression|.
-          1. If _lref_ is *undefined*, return *undefined*.
+          1. If _lref_ is *undefined* and |LeftHandSideExpression| is not a |ParenthesizedExpression|, return *undefined*.
           1. If IsAnonymousFunctionDefinition(|AssignmentExpression|) and IsIdentifierRef of |LeftHandSideExpression| are both *true*, then
             1. Let _rval_ be ? NamedEvaluation of |AssignmentExpression| with argument _lref_.[[ReferencedName]].
           1. Else,
             1. Let _rref_ be ? Evaluation of |AssignmentExpression|.
             1. Let _rval_ be ? GetValue(_rref_).
+          1. If _lref_ is *undefined*, throw a *TypeError* exception.
           1. [id="step-assignmentexpression-evaluation-simple-putvalue"] Perform ? PutValue(_lref_, _rval_).
           1. Return _rval_.
         1. Let _assignmentPattern_ be the |AssignmentPattern| that is covered by |LeftHandSideExpression|.
@@ -20373,7 +20374,9 @@
       <emu-grammar>AssignmentExpression : LeftHandSideExpression AssignmentOperator AssignmentExpression</emu-grammar>
       <emu-alg>
         1. Let _lref_ be ? Evaluation of |LeftHandSideExpression|.
-        1. If _lref_ is *undefined*, return *undefined*.
+        1. If _lref_ is *undefined*, then
+          1. If |LeftHandSideExpression| is a |ParenthesizedExpression|, throw a *TypeError* exception.
+          1. Return *undefined*.
         1. [id="step-assignmentexpression-evaluation-compound-getvalue"] Let _lval_ be ? GetValue(_lref_).
         1. Let _rref_ be ? Evaluation of |AssignmentExpression|.
         1. Let _rval_ be ? GetValue(_rref_).
@@ -20404,7 +20407,9 @@
       <emu-grammar>AssignmentExpression : LeftHandSideExpression `&amp;&amp;=` AssignmentExpression</emu-grammar>
       <emu-alg>
         1. Let _lref_ be ? Evaluation of |LeftHandSideExpression|.
-        1. If _lref_ is *undefined*, return *undefined*.
+        1. If _lref_ is *undefined*, then
+          1. If |LeftHandSideExpression| is a |ParenthesizedExpression|, throw a *TypeError* exception.
+          1. Return *undefined*.
         1. [id="step-assignmentexpression-evaluation-lgcl-and-getvalue"] Let _lval_ be ? GetValue(_lref_).
         1. Let _lbool_ be ToBoolean(_lval_).
         1. If _lbool_ is *false*, return _lval_.
@@ -20419,7 +20424,9 @@
       <emu-grammar>AssignmentExpression : LeftHandSideExpression `||=` AssignmentExpression</emu-grammar>
       <emu-alg>
         1. Let _lref_ be ? Evaluation of |LeftHandSideExpression|.
-        1. If _lref_ is *undefined*, return *undefined*.
+        1. If _lref_ is *undefined*, then
+          1. If |LeftHandSideExpression| is a |ParenthesizedExpression|, throw a *TypeError* exception.
+          1. Return *undefined*.
         1. [id="step-assignmentexpression-evaluation-lgcl-or-getvalue"] Let _lval_ be ? GetValue(_lref_).
         1. Let _lbool_ be ToBoolean(_lval_).
         1. If _lbool_ is *true*, return _lval_.
@@ -20434,7 +20441,9 @@
       <emu-grammar>AssignmentExpression : LeftHandSideExpression `??=` AssignmentExpression</emu-grammar>
       <emu-alg>
         1. Let _lref_ be ? Evaluation of |LeftHandSideExpression|.
-        1. If _lref_ is *undefined*, return *undefined*.
+        1. If _lref_ is *undefined*, then
+          1. If |LeftHandSideExpression| is a |ParenthesizedExpression|, throw a *TypeError* exception.
+          1. Return *undefined*.
         1. [id="step-assignmentexpression-evaluation-lgcl-nullish-getvalue"] Let _lval_ be ? GetValue(_lref_).
         1. If _lval_ is neither *undefined* nor *null*, return _lval_.
         1. If IsAnonymousFunctionDefinition(|AssignmentExpression|) is *true* and IsIdentifierRef of |LeftHandSideExpression| is *true*, then
