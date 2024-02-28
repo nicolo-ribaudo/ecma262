@@ -9669,7 +9669,7 @@
     </emu-clause>
 
     <emu-clause id="sec-static-semantics-assignmenttargettype" oldids="sec-identifiers-static-semantics-assignmenttargettype,sec-identifiers-static-semantics-isvalidsimpleassignmenttarget,sec-semantics-static-semantics-assignmenttargettype,sec-semantics-static-semantics-isvalidsimpleassignmenttarget,sec-grouping-operator-static-semantics-assignmenttargettype,sec-grouping-operator-static-semantics-isvalidsimpleassignmenttarget,sec-static-semantics-static-semantics-assignmenttargettype,sec-static-semantics-static-semantics-isvalidsimpleassignmenttarget,sec-update-expressions-static-semantics-assignmenttargettype,sec-update-expressions-static-semantics-isvalidsimpleassignmenttarget,sec-unary-operators-static-semantics-assignmenttargettype,sec-unary-operators-static-semantics-isvalidsimpleassignmenttarget,sec-exp-operator-static-semantics-assignmenttargettype,sec-exp-operator-static-semantics-isvalidsimpleassignmenttarget,sec-multiplicative-operators-static-semantics-assignmenttargettype,sec-multiplicative-operators-static-semantics-isvalidsimpleassignmenttarget,sec-additive-operators-static-semantics-assignmenttargettype,sec-additive-operators-static-semantics-isvalidsimpleassignmenttarget,sec-bitwise-shift-operators-static-semantics-assignmenttargettype,sec-bitwise-shift-operators-static-semantics-isvalidsimpleassignmenttarget,sec-relational-operators-static-semantics-assignmenttargettype,sec-relational-operators-static-semantics-isvalidsimpleassignmenttarget,sec-equality-operators-static-semantics-assignmenttargettype,sec-equality-operators-static-semantics-isvalidsimpleassignmenttarget,sec-binary-bitwise-operators-static-semantics-assignmenttargettype,sec-binary-bitwise-operators-static-semantics-isvalidsimpleassignmenttarget,sec-binary-logical-operators-static-semantics-assignmenttargettype,sec-binary-logical-operators-static-semantics-isvalidsimpleassignmenttarget,sec-conditional-operator-static-semantics-assignmenttargettype,sec-conditional-operator-static-semantics-isvalidsimpleassignmenttarget,sec-assignment-operators-static-semantics-assignmenttargettype,sec-assignment-operators-static-semantics-isvalidsimpleassignmenttarget,sec-comma-operator-static-semantics-assignmenttargettype,sec-comma-operator-static-semantics-isvalidsimpleassignmenttarget" type="sdo">
-      <h1>Static Semantics: AssignmentTargetType ( ): ~simple~ or ~invalid~</h1>
+      <h1>Static Semantics: AssignmentTargetType ( ): ~simple~, ~optional~, or ~invalid~</h1>
       <dl class="header">
       </dl>
       <emu-grammar>IdentifierReference : Identifier</emu-grammar>
@@ -9695,6 +9695,27 @@
       </emu-grammar>
       <emu-alg>
         1. Return ~simple~.
+      </emu-alg>
+      <emu-grammar>
+        OptionalExpression :
+          MemberExpression OptionalChain
+          CallExpression OptionalChain
+          OptionalExpression OptionalChain
+      </emu-grammar>
+      <emu-alg>
+        1. Return AssignmentTargetType of |OptionalChain|.
+      </emu-alg>
+      <emu-grammar>
+        OptionalChain :
+          `?.` `[` Expression `]`
+          `?.` IdentifierName
+          `?.` PrivateIdentifier
+          OptionalChain `[` Expression `]`
+          OptionalChain `.` IdentifierName
+          OptionalChain `.` PrivateIdentifier
+      </emu-grammar>
+      <emu-alg>
+        1. Return ~optional~.
       </emu-alg>
       <emu-grammar>
         PrimaryExpression :
@@ -9725,6 +9746,12 @@
           CallExpression Arguments
           CallExpression TemplateLiteral
 
+        OptionalChain :
+          `?.` Arguments
+          `?.` TemplateLiteral
+          OptionalChain Arguments
+          OptionalChain TemplateLiteral
+
         NewExpression :
           `new` NewExpression
 
@@ -9737,9 +9764,6 @@
 
         ImportMeta :
           `import` `.` `meta`
-
-        LeftHandSideExpression :
-          OptionalExpression
 
         UpdateExpression :
           LeftHandSideExpression `++`
@@ -20521,7 +20545,7 @@
       <p>If |LeftHandSideExpression| is neither an |ObjectLiteral| nor an |ArrayLiteral|, the following Early Error rule is applied:</p>
       <ul>
         <li>
-          It is a Syntax Error if AssignmentTargetType of |LeftHandSideExpression| is not ~simple~.
+          It is a Syntax Error if AssignmentTargetType of |LeftHandSideExpression| is not ~simple~ or ~optional~.
         </li>
       </ul>
       <emu-grammar>
@@ -20533,7 +20557,7 @@
       </emu-grammar>
       <ul>
         <li>
-          It is a Syntax Error if AssignmentTargetType of |LeftHandSideExpression| is not ~simple~.
+          It is a Syntax Error if AssignmentTargetType of |LeftHandSideExpression| is not ~simple~ or ~optional~.
         </li>
       </ul>
     </emu-clause>
@@ -20544,11 +20568,13 @@
       <emu-alg>
         1. If |LeftHandSideExpression| is neither an |ObjectLiteral| nor an |ArrayLiteral|, then
           1. Let _lref_ be ? Evaluation of |LeftHandSideExpression|.
+          1. If _lref_ is *undefined* and |LeftHandSideExpression| is not a |ParenthesizedExpression|, return *undefined*.
           1. If IsAnonymousFunctionDefinition(|AssignmentExpression|) and IsIdentifierRef of |LeftHandSideExpression| are both *true*, then
             1. Let _rval_ be ? NamedEvaluation of |AssignmentExpression| with argument _lref_.[[ReferencedName]].
           1. Else,
             1. Let _rref_ be ? Evaluation of |AssignmentExpression|.
             1. Let _rval_ be ? GetValue(_rref_).
+          1. If _lref_ is *undefined*, throw a *TypeError* exception.
           1. [id="step-assignmentexpression-evaluation-simple-putvalue"] Perform ? PutValue(_lref_, _rval_).
           1. Return _rval_.
         1. Let _assignmentPattern_ be the |AssignmentPattern| that is covered by |LeftHandSideExpression|.
@@ -20560,6 +20586,9 @@
       <emu-grammar>AssignmentExpression : LeftHandSideExpression AssignmentOperator AssignmentExpression</emu-grammar>
       <emu-alg>
         1. Let _lref_ be ? Evaluation of |LeftHandSideExpression|.
+        1. If _lref_ is *undefined*, then
+          1. If |LeftHandSideExpression| is a |ParenthesizedExpression|, throw a *TypeError* exception.
+          1. Return *undefined*.
         1. [id="step-assignmentexpression-evaluation-compound-getvalue"] Let _lval_ be ? GetValue(_lref_).
         1. Let _rref_ be ? Evaluation of |AssignmentExpression|.
         1. Let _rval_ be ? GetValue(_rref_).
@@ -20590,6 +20619,9 @@
       <emu-grammar>AssignmentExpression : LeftHandSideExpression `&amp;&amp;=` AssignmentExpression</emu-grammar>
       <emu-alg>
         1. Let _lref_ be ? Evaluation of |LeftHandSideExpression|.
+        1. If _lref_ is *undefined*, then
+          1. If |LeftHandSideExpression| is a |ParenthesizedExpression|, throw a *TypeError* exception.
+          1. Return *undefined*.
         1. [id="step-assignmentexpression-evaluation-lgcl-and-getvalue"] Let _lval_ be ? GetValue(_lref_).
         1. Let _lbool_ be ToBoolean(_lval_).
         1. If _lbool_ is *false*, return _lval_.
@@ -20604,6 +20636,9 @@
       <emu-grammar>AssignmentExpression : LeftHandSideExpression `||=` AssignmentExpression</emu-grammar>
       <emu-alg>
         1. Let _lref_ be ? Evaluation of |LeftHandSideExpression|.
+        1. If _lref_ is *undefined*, then
+          1. If |LeftHandSideExpression| is a |ParenthesizedExpression|, throw a *TypeError* exception.
+          1. Return *undefined*.
         1. [id="step-assignmentexpression-evaluation-lgcl-or-getvalue"] Let _lval_ be ? GetValue(_lref_).
         1. Let _lbool_ be ToBoolean(_lval_).
         1. If _lbool_ is *true*, return _lval_.
@@ -20618,6 +20653,9 @@
       <emu-grammar>AssignmentExpression : LeftHandSideExpression `??=` AssignmentExpression</emu-grammar>
       <emu-alg>
         1. Let _lref_ be ? Evaluation of |LeftHandSideExpression|.
+        1. If _lref_ is *undefined*, then
+          1. If |LeftHandSideExpression| is a |ParenthesizedExpression|, throw a *TypeError* exception.
+          1. Return *undefined*.
         1. [id="step-assignmentexpression-evaluation-lgcl-nullish-getvalue"] Let _lval_ be ? GetValue(_lref_).
         1. If _lval_ is neither *undefined* nor *null*, return _lval_.
         1. If IsAnonymousFunctionDefinition(|AssignmentExpression|) is *true* and IsIdentifierRef of |LeftHandSideExpression| is *true*, then
