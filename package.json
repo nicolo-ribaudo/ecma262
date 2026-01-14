@@ -10,9 +10,9 @@
     "build-only": "ecmarkup --verbose spec.html --multipage out",
     "build": "npm run build-head",
     "build-for-pdf": "npm run prebuild-only && ecmarkup --verbose spec.html out/index.html --assets external --assets-dir out --printable --lint-spec --strict",
-    "pdf": "npm run build-for-pdf && prince --script ./node_modules/ecmarkup/js/print.js out/index.html -o out/ECMA-262.pdf",
+    "pdf": "npm run build-for-pdf && prince-books --script ./node_modules/ecmarkup/js/print.js out/index.html -o out/ECMA-262.pdf",
     "prebuild-snapshot": "npm run clean",
-    "build-snapshot": "npm run build-head && node scripts/insert_snapshot_warning.js",
+    "build-snapshot": "npm run build-head && node scripts/insert-snapshot-warning.js",
     "clean": "rm -rf out",
     "format": "emu-format --write spec.html",
     "test": "exit 0",
@@ -24,12 +24,7 @@
   "license": "SEE LICENSE IN https://tc39.es/ecma262/#sec-copyright-and-software-license",
   "homepage": "https://tc39.es/ecma262/",
   "devDependencies": {
-    "ecmarkup": "^21.2.0",
-    "glob": "^7.1.6",
-    "jsdom": "^15.0.0",
-    "pagedjs": "^0.4.3",
-    "pagedjs-cli": "^0.4.3",
-    "tar-stream": "^2.2.0",
-    "tiny-json-http": "^7.1.2"
+    "ecmarkup": "^21.5.0",
+    "jsdom": "^27.0.0"
   }
 }
