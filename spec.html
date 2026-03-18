@@ -7019,6 +7019,21 @@
       </emu-alg>
     </emu-clause>
 
+    <emu-clause id="sec-StoreIteratorNext" type="abstract operation">
+      <h1>
+        StoreIteratorNext (
+          _iteratorRecord_: an Iterator Record,
+        ): either a normal completion containing ~unused~ or a throw completion
+      </h1>
+      <dl class="header">
+      </dl>
+      <emu-alg>
+        1. Let _nextMethod_ be ? Get(_iteratorRecord_.[[Iterator]], *"next"*).
+        1. Set _iteratorRecord_.[[NextMethod]] to _nextMethod_.
+        1. Return ~unused~.
+      </emu-alg>
+    </emu-clause>
+
     <emu-clause id="sec-getiteratorfrommethod" type="abstract operation">
       <h1>
         GetIteratorFromMethod (
@@ -48442,7 +48457,7 @@ THH:mm:ss.sss
             1. If _integerLimit_ &lt; 0, then
               1. Let _error_ be ThrowCompletion(a newly created *RangeError* object).
               1. Return ? IteratorClose(_iterated_, _error_).
-            1. Set _iterated_ to ? GetIteratorDirect(_O_).
+            1. Perform ? StoreIteratorNext(_iterated_).
             1. Let _closure_ be a new Abstract Closure with no parameters that captures _iterated_ and _integerLimit_ and performs the following steps when called:
               1. Let _remaining_ be _integerLimit_.
               1. Repeat, while _remaining_ > 0,
@@ -48471,7 +48486,7 @@ THH:mm:ss.sss
             1. If IsCallable(_predicate_) is *false*, then
               1. Let _error_ be ThrowCompletion(a newly created *TypeError* object).
               1. Return ? IteratorClose(_iterated_, _error_).
-            1. Set _iterated_ to ? GetIteratorDirect(_O_).
+            1. Perform ? StoreIteratorNext(_iterated_).
             1. Let _counter_ be 0.
             1. Repeat,
               1. Let _value_ be ? IteratorStepValue(_iterated_).
@@ -48493,7 +48508,7 @@ THH:mm:ss.sss
             1. If IsCallable(_predicate_) is *false*, then
               1. Let _error_ be ThrowCompletion(a newly created *TypeError* object).
               1. Return ? IteratorClose(_iterated_, _error_).
-            1. Set _iterated_ to ? GetIteratorDirect(_O_).
+            1. Perform ? StoreIteratorNext(_iterated_).
             1. Let _closure_ be a new Abstract Closure with no parameters that captures _iterated_ and _predicate_ and performs the following steps when called:
               1. Let _counter_ be 0.
               1. Repeat,
@@ -48521,7 +48536,7 @@ THH:mm:ss.sss
             1. If IsCallable(_predicate_) is *false*, then
               1. Let _error_ be ThrowCompletion(a newly created *TypeError* object).
               1. Return ? IteratorClose(_iterated_, _error_).
-            1. Set _iterated_ to ? GetIteratorDirect(_O_).
+            1. Perform ? StoreIteratorNext(_iterated_).
             1. Let _counter_ be 0.
             1. Repeat,
               1. Let _value_ be ? IteratorStepValue(_iterated_).
@@ -48543,7 +48558,7 @@ THH:mm:ss.sss
             1. If IsCallable(_mapper_) is *false*, then
               1. Let _error_ be ThrowCompletion(a newly created *TypeError* object).
               1. Return ? IteratorClose(_iterated_, _error_).
-            1. Set _iterated_ to ? GetIteratorDirect(_O_).
+            1. Perform ? StoreIteratorNext(_iterated_).
             1. Let _closure_ be a new Abstract Closure with no parameters that captures _iterated_ and _mapper_ and performs the following steps when called:
               1. Let _counter_ be 0.
               1. Repeat,
@@ -48582,7 +48597,7 @@ THH:mm:ss.sss
             1. If IsCallable(_procedure_) is *false*, then
               1. Let _error_ be ThrowCompletion(a newly created *TypeError* object).
               1. Return ? IteratorClose(_iterated_, _error_).
-            1. Set _iterated_ to ? GetIteratorDirect(_O_).
+            1. Perform ? StoreIteratorNext(_iterated_).
             1. Let _counter_ be 0.
             1. Repeat,
               1. Let _value_ be ? IteratorStepValue(_iterated_).
@@ -48603,7 +48618,7 @@ THH:mm:ss.sss
             1. If IsCallable(_mapper_) is *false*, then
               1. Let _error_ be ThrowCompletion(a newly created *TypeError* object).
               1. Return ? IteratorClose(_iterated_, _error_).
-            1. Set _iterated_ to ? GetIteratorDirect(_O_).
+            1. Perform ? StoreIteratorNext(_iterated_).
             1. Let _closure_ be a new Abstract Closure with no parameters that captures _iterated_ and _mapper_ and performs the following steps when called:
               1. Let _counter_ be 0.
               1. Repeat,
@@ -48630,7 +48645,7 @@ THH:mm:ss.sss
             1. If IsCallable(_reducer_) is *false*, then
               1. Let _error_ be ThrowCompletion(a newly created *TypeError* object).
               1. Return ? IteratorClose(_iterated_, _error_).
-            1. Set _iterated_ to ? GetIteratorDirect(_O_).
+            1. Perform ? StoreIteratorNext(_iterated_).
             1. If _initialValue_ is not present, then
               1. Let _accumulator_ be ? IteratorStepValue(_iterated_).
               1. If _accumulator_ is ~done~, throw a *TypeError* exception.
@@ -48658,7 +48673,7 @@ THH:mm:ss.sss
             1. If IsCallable(_predicate_) is *false*, then
               1. Let _error_ be ThrowCompletion(a newly created *TypeError* object).
               1. Return ? IteratorClose(_iterated_, _error_).
-            1. Set _iterated_ to ? GetIteratorDirect(_O_).
+            1. Perform ? StoreIteratorNext(_iterated_).
             1. Let _counter_ be 0.
             1. Repeat,
               1. Let _value_ be ? IteratorStepValue(_iterated_).
@@ -48686,7 +48701,7 @@ THH:mm:ss.sss
             1. If _integerLimit_ &lt; 0, then
               1. Let _error_ be ThrowCompletion(a newly created *RangeError* object).
               1. Return ? IteratorClose(_iterated_, _error_).
-            1. Set _iterated_ to ? GetIteratorDirect(_O_).
+            1. Perform ? StoreIteratorNext(_iterated_).
             1. Let _closure_ be a new Abstract Closure with no parameters that captures _iterated_ and _integerLimit_ and performs the following steps when called:
               1. Let _remaining_ be _integerLimit_.
               1. Repeat,
